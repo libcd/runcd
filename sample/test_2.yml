@@ -1,0 +1,14 @@
+# this example yaml file demonstrates the ability to start
+# detached service containers
+
+pipeline:
+  redis:
+    detach: true
+    image: redis:2.8
+  backend:
+    image: golang:1.5
+    commands:
+      - go version
+  frontend:
+    image: node:5.0.0
+    commands: node -v

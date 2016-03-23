@@ -1,0 +1,11 @@
+# this example yaml file demonstrates the ability to start
+# multiple build containers
+
+pipeline:
+  backend:
+    image: golang:1.5
+    commands:
+      - go version
+  frontend:
+    image: node:5.0.0
+    commands: node -v
