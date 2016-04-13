@@ -1,22 +1,22 @@
 {
-  "volumes": [
-    {
-      "name": "volume_0"
-    }
-  ],
+  "volumes": null,
   "objects": [
     {
-      "name": "container_1",
+      "name": "service_0",
       "image": "redis:2.8",
-      "detach": true,
-      "auth_config": {}
-    },
-    {
-      "name": "container_2",
-      "image": "golang:1.5",
       "auth_config": {},
       "environment": {
-        "CI_CMDS": "ClsgLXogIiRIT01FIiAgXSAmJiBleHBvcnQgSE9NRT0iL3Jvb3QiClsgLXogIiRTSEVMTCIgXSAmJiBleHBvcnQgU0hFTEw9Ii9iaW4vc2giCmV4cG9ydCBHT0JJTj0vL2JpbgpleHBvcnQgR09QQVRIPS8KZXhwb3J0IFBBVEg9JFBBVEg6JEdPQklOCnNldCAtZQoKCmVjaG8gIjxjb21tYW5kPmdvIHZlcnNpb248L2NvbW1hbmQ+IgpnbyB2ZXJzaW9uCgoKcm0gLXJmICRIT01FLy5uZXRyYwpybSAtcmYgJEhPTUUvLnNzaC9pZF9yc2EK"
+        "CI": "true"
+      }
+    },
+    {
+      "name": "script_0",
+      "image": "golang:1.5",
+      "auth_config": {},
+      "working_dir": "/drone/drone/src",
+      "environment": {
+        "CI": "true",
+        "CI_CMDS": "ClsgLXogIiRIT01FIiAgXSAmJiBleHBvcnQgSE9NRT0iL3Jvb3QiClsgLXogIiRTSEVMTCIgXSAmJiBleHBvcnQgU0hFTEw9Ii9iaW4vc2giCmV4cG9ydCBHT0JJTj0vL2Ryb25lL2Ryb25lL3NyYy9iaW4KZXhwb3J0IEdPUEFUSD0vL2Ryb25lL2Ryb25lL3NyYwpleHBvcnQgUEFUSD0kUEFUSDokR09CSU4Kc2V0IC1lCgoKZWNobyAiPGNvbW1hbmQ+Z28gdmVyc2lvbjwvY29tbWFuZD4iCmdvIHZlcnNpb24KCmVjaG8gIjxjb21tYW5kPmVudjwvY29tbWFuZD4iCmVudgoKZWNobyAiPGNvbW1hbmQ+Zm9yIGkgaW4gMSAyIDMgNCA1OyBkbyBzbGVlcCAxOyBkb25lPC9jb21tYW5kPiIKZm9yIGkgaW4gMSAyIDMgNCA1OyBkbyBzbGVlcCAxOyBkb25lCgoKcm0gLXJmICRIT01FLy5uZXRyYwpybSAtcmYgJEhPTUUvLnNzaC9pZF9yc2EK"
       },
       "entrypoint": [
         "/bin/sh",
@@ -27,11 +27,13 @@
       ]
     },
     {
-      "name": "container_3",
+      "name": "script_1",
       "image": "node:5.0.0",
       "auth_config": {},
+      "working_dir": "/drone/drone/src",
       "environment": {
-        "CI_CMDS": "ClsgLXogIiRIT01FIiAgXSAmJiBleHBvcnQgSE9NRT0iL3Jvb3QiClsgLXogIiRTSEVMTCIgXSAmJiBleHBvcnQgU0hFTEw9Ii9iaW4vc2giCmV4cG9ydCBHT0JJTj0vL2JpbgpleHBvcnQgR09QQVRIPS8KZXhwb3J0IFBBVEg9JFBBVEg6JEdPQklOCnNldCAtZQoKCmVjaG8gIjxjb21tYW5kPm5vZGUgLXY8L2NvbW1hbmQ+Igpub2RlIC12CgoKcm0gLXJmICRIT01FLy5uZXRyYwpybSAtcmYgJEhPTUUvLnNzaC9pZF9yc2EK"
+        "CI": "true",
+        "CI_CMDS": "ClsgLXogIiRIT01FIiAgXSAmJiBleHBvcnQgSE9NRT0iL3Jvb3QiClsgLXogIiRTSEVMTCIgXSAmJiBleHBvcnQgU0hFTEw9Ii9iaW4vc2giCmV4cG9ydCBHT0JJTj0vL2Ryb25lL2Ryb25lL3NyYy9iaW4KZXhwb3J0IEdPUEFUSD0vL2Ryb25lL2Ryb25lL3NyYwpleHBvcnQgUEFUSD0kUEFUSDokR09CSU4Kc2V0IC1lCgoKZWNobyAiPGNvbW1hbmQ+bm9kZSAtdjwvY29tbWFuZD4iCm5vZGUgLXYKCgpybSAtcmYgJEhPTUUvLm5ldHJjCnJtIC1yZiAkSE9NRS8uc3NoL2lkX3JzYQo="
       },
       "entrypoint": [
         "/bin/sh",
@@ -47,15 +49,16 @@
     "body": [
       {
         "type": "run",
-        "name": "container_1"
+        "name": "service_0",
+        "detach": true
       },
       {
         "type": "run",
-        "name": "container_2"
+        "name": "script_0"
       },
       {
         "type": "run",
-        "name": "container_3"
+        "name": "script_1"
       }
     ]
   }

@@ -1,14 +1,15 @@
 package main
 
 import (
-	// "encoding/json"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
 
 	"github.com/libcd/libcd"
 	"github.com/libcd/libcd/docker"
-	// "github.com/libcd/libyaml"
+	"github.com/libcd/libyaml"
+	"github.com/libcd/libyaml/builtin"
 
 	"github.com/codegangsta/cli"
 )
@@ -34,27 +35,36 @@ func main() {
 }
 
 func compileCmd(c *cli.Context) {
-	// filename := c.Args().First()
-	// filedata, err := ioutil.ReadFile(filename)
-	// if err != nil {
-	// 	fmt.Printf("Unable to open file %s. %s", filename, err)
-	// 	return
-	// }
+	filename := c.Args().First()
+	filedata, err := ioutil.ReadFile(filename)
+	if err != nil {
+		fmt.Printf("Unable to open file %s. %s", filename, err)
+		return
+	}
 
-	// parsed, err := libyaml.Parse(filedata)
-	// if err != nil {
-	// 	fmt.Printf("Unable to parse file %s. %s", filename, err)
-	// 	return
-	// }
+	trans := []libyaml.Transform{
+		builtin.NewWorkspaceOp("/drone", "drone/src"),
+		builtin.NewNormalizeOp("plugins"),
+		builtin.NewPullOp(false),
+		builtin.NewEnvOp(map[string]string{"CI": "true"}),
+		builtin.NewValidateOp(false, []string{"plugins/*"}),
+		builtin.NewShellOp(builtin.Linux_adm64),
+		builtin.NewArgsOp(),
+		builtin.NewPodOp("drone_"),
+		// builtin.NewCloneOp("plugins/drone-git"),
+		// builtin.NewCacheOp("plugins/drone-cache", "/var/lib/drone/cache"),
+	}
 
-	// spec, err := parsed.Compiler().Compile()
-	// if err != nil {
-	// 	fmt.Printf("Unable to compile file %s. %s", filename, err)
-	// 	return
-	// }
+	compiler := libyaml.New()
+	compiler.Transforms(trans)
+	spec, err := compiler.Compile(filedata)
+	if err != nil {
+		fmt.Printf("Unable to compile file %s. %s", filename, err)
+		return
+	}
 
-	// out, _ := json.MarshalIndent(spec, "", "  ")
-	// os.Stdout.Write(out)
+	out, _ := json.MarshalIndent(spec, "", "  ")
+	os.Stdout.Write(out)
 }
 
 func executeCmd(c *cli.Context) {

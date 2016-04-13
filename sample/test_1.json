@@ -1,39 +1,17 @@
 {
-  "volumes": [
-    {
-      "name": "volume_0"
-    }
-  ],
+  "volumes": null,
   "objects": [
     {
-      "name": "container_1",
+      "name": "backend",
       "image": "golang:1.5",
       "auth_config": {},
-      "environment": {
-        "CI_CMDS": "ClsgLXogIiRIT01FIiAgXSAmJiBleHBvcnQgSE9NRT0iL3Jvb3QiClsgLXogIiRTSEVMTCIgXSAmJiBleHBvcnQgU0hFTEw9Ii9iaW4vc2giCmV4cG9ydCBHT0JJTj0vL2JpbgpleHBvcnQgR09QQVRIPS8KZXhwb3J0IFBBVEg9JFBBVEg6JEdPQklOCnNldCAtZQoKCmVjaG8gIjxjb21tYW5kPmdvIHZlcnNpb248L2NvbW1hbmQ+IgpnbyB2ZXJzaW9uCgoKcm0gLXJmICRIT01FLy5uZXRyYwpybSAtcmYgJEhPTUUvLnNzaC9pZF9yc2EK"
-      },
-      "entrypoint": [
-        "/bin/sh",
-        "-c"
-      ],
-      "command": [
-        "echo $CI_CMDS | base64 -d | /bin/sh"
-      ]
+      "working_dir": "/drone/drone/src"
     },
     {
-      "name": "container_2",
+      "name": "frontend",
       "image": "node:5.0.0",
       "auth_config": {},
-      "environment": {
-        "CI_CMDS": "ClsgLXogIiRIT01FIiAgXSAmJiBleHBvcnQgSE9NRT0iL3Jvb3QiClsgLXogIiRTSEVMTCIgXSAmJiBleHBvcnQgU0hFTEw9Ii9iaW4vc2giCmV4cG9ydCBHT0JJTj0vL2JpbgpleHBvcnQgR09QQVRIPS8KZXhwb3J0IFBBVEg9JFBBVEg6JEdPQklOCnNldCAtZQoKCmVjaG8gIjxjb21tYW5kPm5vZGUgLXY8L2NvbW1hbmQ+Igpub2RlIC12CgoKcm0gLXJmICRIT01FLy5uZXRyYwpybSAtcmYgJEhPTUUvLnNzaC9pZF9yc2EK"
-      },
-      "entrypoint": [
-        "/bin/sh",
-        "-c"
-      ],
-      "command": [
-        "echo $CI_CMDS | base64 -d | /bin/sh"
-      ]
+      "working_dir": "/drone/drone/src"
     }
   ],
   "nodes": {
@@ -41,11 +19,11 @@
     "body": [
       {
         "type": "run",
-        "name": "container_1"
+        "name": "script_0"
       },
       {
         "type": "run",
-        "name": "container_2"
+        "name": "script_1"
       }
     ]
   }
