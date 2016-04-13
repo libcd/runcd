@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 
 	"github.com/libcd/libcd"
 	"github.com/libcd/libcd/docker"
+	"github.com/libcd/libcd/graph"
 	"github.com/libcd/libyaml"
 	"github.com/libcd/libyaml/builtin"
+	"github.com/pkg/browser"
 
 	"github.com/codegangsta/cli"
 )
@@ -22,24 +25,28 @@ func main() {
 		{
 			Name:   "compile",
 			Usage:  "compile the yaml file",
-			Action: compileCmd,
+			Action: errorCommand(compileCmd),
 		},
 		{
 			Name:   "exec",
 			Usage:  "execute the compiled file",
-			Action: executeCmd,
+			Action: errorCommand(executeCmd),
+		},
+		{
+			Name:   "graph",
+			Usage:  "generate the graphviz file",
+			Action: errorCommand(graphCmd),
 		},
 	}
 
 	app.Run(os.Args)
 }
 
-func compileCmd(c *cli.Context) {
+func compileCmd(c *cli.Context) error {
 	filename := c.Args().First()
 	filedata, err := ioutil.ReadFile(filename)
 	if err != nil {
-		fmt.Printf("Unable to open file %s. %s", filename, err)
-		return
+		return err
 	}
 
 	trans := []libyaml.Transform{
@@ -59,26 +66,25 @@ func compileCmd(c *cli.Context) {
 	compiler.Transforms(trans)
 	spec, err := compiler.Compile(filedata)
 	if err != nil {
-		fmt.Printf("Unable to compile file %s. %s", filename, err)
-		return
+		return err
 	}
 
 	out, _ := json.MarshalIndent(spec, "", "  ")
 	os.Stdout.Write(out)
+
+	return nil
 }
 
-func executeCmd(c *cli.Context) {
+func executeCmd(c *cli.Context) error {
 	filename := c.Args().First()
 	filedata, err := readFileOrStdin(filename)
 	if err != nil {
-		fmt.Printf("Unable to read file from disk or stdin. %s", err)
-		return
+		return err
 	}
 
 	spec, err := libcd.Parse(filedata)
 	if err != nil {
-		fmt.Printf("Unable to open file %s. %s", filename, err)
-		return
+		return err
 	}
 
 	conf := libcd.Config{
@@ -86,8 +92,7 @@ func executeCmd(c *cli.Context) {
 	}
 	runner := conf.Runner(libcd.NoContext, spec)
 	if err := runner.Run(); err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 
 	pipe := runner.Pipe()
@@ -99,16 +104,56 @@ func executeCmd(c *cli.Context) {
 		fmt.Println(line)
 	}
 
-	if err := runner.Wait(); err != nil {
-		fmt.Println(err)
-		return
+	return runner.Wait()
+}
+
+func graphCmd(c *cli.Context) error {
+	filename := c.Args().First()
+	filedata, err := readFileOrStdin(filename)
+	if err != nil {
+		return err
 	}
+
+	spec, err := libcd.Parse(filedata)
+	if err != nil {
+		return err
+	}
+
+	cmd := exec.Command("dot", "-Tsvg")
+	cmd.Stderr = os.Stderr
+	in, err := cmd.StdinPipe()
+	if err != nil {
+		return err
+	}
+	out, err := cmd.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+	println(string(graph.Create(spec)))
+
+	graph.WriteTo(spec, in)
+	in.Close()
+
+	browser.OpenReader(out)
+	return cmd.Wait()
 }
 
 func readFileOrStdin(filename string) ([]byte, error) {
 	if filename == "" {
 		return ioutil.ReadAll(os.Stdin)
-	} else {
-		return ioutil.ReadFile(filename)
+	}
+	return ioutil.ReadFile(filename)
+}
+
+func errorCommand(fn func(*cli.Context) error) func(*cli.Context) {
+	return func(c *cli.Context) {
+		err := fn(c)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 	}
 }
